@@ -4,10 +4,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
-
+from .models import User, Bid, Auction, Comment
 
 def index(request):
+    if request.method == "POST":
+        breakpoint()
+        
+        return render(request, "auctions/index.html", {
+            
+        })
     return render(request, "auctions/index.html")
 
 def login_view(request):
@@ -62,6 +67,4 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def create(request):
-    if request.method == "POST":
-        breakpoint()
     return render(request, "auctions/create.html")

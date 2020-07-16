@@ -21,11 +21,11 @@ class Comment(models.Model):
 
 class Auction(models.Model):
     name = models.CharField(max_length=64,default="")
-    price = models.PositiveIntegerField(validators=[MinValueValidator(0),])
+    bid = models.PositiveIntegerField(validators=[MinValueValidator(0),])
     description = models.CharField(max_length=200, blank=True, default="")
     dateTime = models.DateTimeField(auto_now=True)
-    bid = models.ForeignKey(Bid, on_delete=models.CASCADE, related_name="auctions", default=price)
     comment = models.ForeignKey(Comment, on_delete=models.DO_NOTHING, default=None)
+    url = models.URLField(max_length=300, default="#", blank=True)
 
     def __str__(self):
-        return f"{self.name}: ${self.price}, {self.description}, {self.dateTime}, ${self.bid}"
+        return f"{self.name}: {self.description}, {self.dateTime}, ${self.bid}, {self.url}"

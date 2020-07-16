@@ -3,5 +3,9 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    {% if not user.is_authenticated %}
+        Please login to see active listings.
+    {% endif %}
+
+    
 {% endblock %}
