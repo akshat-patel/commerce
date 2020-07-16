@@ -6,6 +6,36 @@
     {% if not user.is_authenticated %}
         Please login to see active listings.
     {% endif %}
-
-    
+    <div class="card bg-light">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm">
+                    <img src="https://pixabay.com/get/55e5dd424c56ab14f6d1867dda35367b1c3bd7e75b57784f_1920.jpg" class="img-fluid" alt="Responsive image">
+                </div>
+                <div class="col-sm">
+                    <div class="row">
+                        <div class="col">
+                            <h2>Nerf Gun</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h6>Starting Bid: $60</h6>
+                            <p>Category: Toys</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p>A cool gun</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <small class="text-muted">Created today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -24,8 +24,9 @@ class Auction(models.Model):
     bid = models.PositiveIntegerField(validators=[MinValueValidator(0),])
     description = models.CharField(max_length=200, blank=True, default="")
     dateTime = models.DateTimeField(auto_now=True)
-    comment = models.ForeignKey(Comment, on_delete=models.DO_NOTHING, default=None)
+    comment = models.ForeignKey(Comment, on_delete=models.DO_NOTHING, blank=True, null=True, related_name="auctions")
     url = models.URLField(max_length=300, default="#", blank=True)
+    category=models.CharField(max_length=50, default="")
 
     def __str__(self):
-        return f"{self.name}: {self.description}, {self.dateTime}, ${self.bid}, {self.url}"
+        return f"{self.name}: {self.description}, {self.dateTime}, ${self.bid}, {self.url}, {self.category}"

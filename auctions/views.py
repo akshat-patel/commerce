@@ -8,10 +8,17 @@ from .models import User, Bid, Auction, Comment
 
 def index(request):
     if request.method == "POST":
-        breakpoint()
-        
+        title = request.POST["title"]
+        bid = int(request.POST["startingBid"])
+        category = request.POST["category"]
+        image = request.POST["img"]
+        description = request.POST["description"]
+
+        listing = Auction(name=title, bid=bid,description=description,url=image, category=category)
+        listing.save()
+
         return render(request, "auctions/index.html", {
-            
+            "listing": listing
         })
     return render(request, "auctions/index.html")
 
