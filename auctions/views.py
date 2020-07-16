@@ -10,7 +10,6 @@ from .models import User
 def index(request):
     return render(request, "auctions/index.html")
 
-
 def login_view(request):
     if request.method == "POST":
 
@@ -61,3 +60,6 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+def create(request):
+    return render(request, "auctions/create.html")
