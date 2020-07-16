@@ -62,4 +62,6 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def create(request):
+    if request.method == "POST":
+        breakpoint()
     return render(request, "auctions/create.html")
