@@ -3,11 +3,13 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import User, Bid, Auction, Comment
 
 def index(request):
     if request.method == "POST":
+        
         title = request.POST["title"]
         bid = int(request.POST["startingBid"])
         category = request.POST["category"]
@@ -17,8 +19,11 @@ def index(request):
         listing = Auction(name=title, bid=bid,description=description,url=image, category=category)
         listing.save()
 
+        listings = Auction.objects.all()
+
         return render(request, "auctions/index.html", {
-            "listing": listing
+            "listings": listings,
+            "user": request.user.username,
         })
     return render(request, "auctions/index.html")
 
