@@ -9,6 +9,7 @@ from .forms import AuctionForm
 
 def index(request):
     auctions = Auction.objects.all()
+
     context = {
         'auctions': auctions
     }
@@ -67,14 +68,16 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def create(request):
-    form = AuctionForm()
+    listing = AuctionForm()
     if request.method == "POST":
         #print(request.POST)
         form = AuctionForm(request.POST)
         if form.is_valid():
-            form.save()
+            listing = form.save(commit=False)
+            listing.createdBy = User.objects.filter(username=request.user.username).get()
+            listing.save()
             return redirect('index')
-    context = {"form": form}
+    context = {"form": listing}
     return render(request, "auctions/create.html", context)
 
 def update(request, pk):
