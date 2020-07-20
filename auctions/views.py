@@ -1,19 +1,19 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .models import User, Bid, Auction, Comment
+from .forms import AuctionForm
 
 def index(request):
-    if request.method == "POST":
-        breakpoint()
-        
-        return render(request, "auctions/index.html", {
-            
-        })
-    return render(request, "auctions/index.html")
+    auctions = Auction.objects.all()
+    context = {
+        'auctions': auctions
+    }
+
+    return render(request, "auctions/index.html", context)
 
 def login_view(request):
     if request.method == "POST":
@@ -67,4 +67,17 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def create(request):
-    return render(request, "auctions/create.html")
+    form = AuctionForm()
+    if request.method == "POST":
+        #print(request.POST)
+        form = AuctionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    context = {"form": form}
+    return render(request, "auctions/create.html", context)
+
+def update(request, pk):
+    form = AuctionForm()
+    context = {"form": form}
+    return render(request, "auctions/create.html", context)
