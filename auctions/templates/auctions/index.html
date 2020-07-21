@@ -35,7 +35,11 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <small class="text-muted">Created {{ listing.datetime }} by {{ listing.createdBy }}</small>
+                                    {% if listing.createdBy.username == username %}
+                                        <small class="text-muted">Created {{ listing.datetime }} by you</small>
+                                    {% else %}
+                                        <small class="text-muted">Created {{ listing.datetime }} by {{ listing.createdBy.username }}</small>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

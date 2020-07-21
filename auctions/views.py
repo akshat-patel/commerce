@@ -11,9 +11,9 @@ def index(request):
     auctions = Auction.objects.all()
 
     context = {
-        'auctions': auctions
+        'auctions': auctions,
+        'username': request.user.username
     }
-
     return render(request, "auctions/index.html", context)
 
 def login_view(request):
