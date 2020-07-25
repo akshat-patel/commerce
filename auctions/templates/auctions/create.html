@@ -1,7 +1,11 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Create A New Listing</h2>
+    {% if updateTitle %}
+        <h2>{{ updateTitle }}</h2>
+    {% else %}
+        <h2>Create A New Listing</h2>
+    {% endif %}
     &nbsp;
     <form action="" method="POST">
         {% csrf_token %}

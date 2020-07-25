@@ -70,17 +70,38 @@ def register(request):
 def create(request):
     listing = AuctionForm()
     if request.method == "POST":
-        #print(request.POST)
         form = AuctionForm(request.POST)
         if form.is_valid():
             listing = form.save(commit=False)
             listing.createdBy = User.objects.filter(username=request.user.username).get()
+            listing.currentBid = Bid(bidValue=request.POST["bid"], user=User.objects.filter(username=request.user.username).get())
+            listing.currentBid.save()
             listing.save()
             return redirect('index')
     context = {"form": listing}
     return render(request, "auctions/create.html", context)
 
 def update(request, pk):
-    form = AuctionForm()
-    context = {"form": form}
+    listing = Auction.objects.get(id=pk)
+    form = AuctionForm(instance=listing)
+    if request.method == "POST":
+        form = AuctionForm(request.POST, instance=listing)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.createdBy = User.objects.filter(username=request.user.username).get()
+            listing.save()
+            return redirect('index')
+    context = {"form": form, "updateTitle": 'Update'}
     return render(request, "auctions/create.html", context)
+
+def delete(request, pk):
+    auction = Auction.objects.get(id=pk)
+    if request.method == "POST":
+        auction.delete()
+        return redirect('index')
+
+    context= {
+        'auction': auction
+    }
+
+    return render(request, "auctions/delete.html", context)
