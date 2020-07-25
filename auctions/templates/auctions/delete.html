@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% block body %}
+
+<br>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-body bg-danger text-white">
+            <p><strong>Are you sure you want to delete "{{ auction }}"?</strong></p>
+            <form action="{% url 'delete' auction.id %}"method="POST">
+                {% csrf_token %}
+                <a style="color: white" href="{% url 'index' %}">Cancel</a>
+                <input type="submit" name="Confirm">
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

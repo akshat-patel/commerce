@@ -7,6 +7,8 @@ from django.urls import reverse
 from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm
 
+auctions = {}
+
 def index(request):
     auctions = Auction.objects.all()
 
@@ -74,7 +76,7 @@ def create(request):
         if form.is_valid():
             listing = form.save(commit=False)
             listing.createdBy = User.objects.filter(username=request.user.username).get()
-            listing.currentBid = Bid(bidValue=request.POST["bid"], user=User.objects.filter(username=request.user.username).get())
+            listing.currentBid = Bid(bidValue=int(request.POST["bid"]), user=User.objects.filter(username=request.user.username).get(), listing=request.POST["name"])
             listing.currentBid.save()
             listing.save()
             return redirect('index')
