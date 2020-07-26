@@ -90,7 +90,11 @@ def update(request, pk):
         form = AuctionForm(request.POST, instance=listing)
         if form.is_valid():
             listing = form.save(commit=False)
+            if form.has_changed() and form.changed_data == ['bid']:
+                listing.currentBid.delete()
             listing.createdBy = User.objects.filter(username=request.user.username).get()
+            listing.currentBid = Bid(bidValue=int(request.POST["bid"]), user=User.objects.filter(username=request.user.username).get(), listing=request.POST["name"])
+            listing.currentBid.save()
             listing.save()
             return redirect('index')
     context = {"form": form, "updateTitle": 'Update'}
