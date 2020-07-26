@@ -3,11 +3,12 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.views.generic import CreateView
 
 from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm
 
-auctions = {}
+
 
 def index(request):
     auctions = Auction.objects.all()

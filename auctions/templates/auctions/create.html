@@ -1,5 +1,6 @@
 {% extends "auctions/layout.html" %}
 
+{% load crispy_forms_tags %}
 {% block body %}
     {% if updateTitle %}
         <h2>{{ updateTitle }}</h2>
@@ -7,9 +8,11 @@
         <h2>Create A New Listing</h2>
     {% endif %}
     &nbsp;
-    <form action="" method="POST">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" name="Submit">
-    </form>
+    <div class="form-group"></div>
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <input class="btn btn-secondary" type="submit" name="Submit">
+        </form>
+    </div>
 {% endblock %}
