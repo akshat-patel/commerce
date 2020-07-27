@@ -32,11 +32,12 @@ class Auction(models.Model):
         ('Electronics', 'Electronics'),
         ('Fashion', 'Fashion'),
     ]
+    
     name = models.CharField(max_length=64,default="")
     bid = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0),])
     currentBid = models.ForeignKey(Bid, on_delete=models.SET_NULL, related_name="auctions", blank=True, null=True, default='')
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='None')
-    description = models.CharField(max_length=200, blank=True, default="")
+    description = models.TextField(blank=True, default="")
     dateTime = models.DateTimeField(auto_now_add=True, name="datetime")
     url = models.URLField(max_length=300, default="", blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auctions", blank=True, null=True, default='')

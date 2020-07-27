@@ -8,11 +8,10 @@ from django.views.generic import CreateView
 from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm
 
-
+#Bid.objects.filter(listing="Nerf Gun").aggregate(Max('bidValue'))
 
 def index(request):
     auctions = Auction.objects.all()
-
     context = {
         'auctions': auctions,
         'username': request.user.username
@@ -112,3 +111,10 @@ def delete(request, pk):
     }
 
     return render(request, "auctions/delete.html", context)
+
+def listing(request, pk):
+    auction = Auction.objects.get(id=pk)
+
+    return render(request, "auctions/display.html", {
+        'listing': auction
+    })

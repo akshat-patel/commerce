@@ -8,11 +8,35 @@
         <h2>Create A New Listing</h2>
     {% endif %}
     &nbsp;
-    <div class="form-group"></div>
-        <form action="" method="POST">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <input class="btn btn-secondary" type="submit" name="Submit">
-        </form>
+    <div class="card bg-light">
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        {{ form.bid|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.category|as_crispy_field }}
+                        <div class="row-6">
+                            {{ form.url|as_crispy_field }}
+                        </div>
+                        <br></br>
+                        <div class="row-6">
+                            <input class="btn btn-secondary" type="submit" name="Submit">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+
 {% endblock %}
