@@ -7,9 +7,13 @@
     <div class="col-md-6">
         <div class="card card-body bg-danger text-white">
             <p><strong>Are you sure you want to delete "{{ auction }}"?</strong></p>
-            <form action="{% url 'delete' auction.id %}"method="POST">
+            <form action="{% url 'delete' auction.id %}" method="POST">
                 {% csrf_token %}
-                <a style="color: white" href="{% url 'index' %}">Cancel</a>
+                {% if route == 'listing' %}
+                    <a style="color: white" href="{% url 'listing' auction.id %}">Cancel</a>
+                {% else %}
+                    <a style="color: white" href="{% url 'index' %}">Cancel</a>
+                {% endif %}
                 <input type="submit" name="Confirm">
             </form>
         </div>

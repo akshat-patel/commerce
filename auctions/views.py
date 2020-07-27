@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import CreateView
+from django.db.models import Max
 
 from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm
@@ -106,15 +107,21 @@ def delete(request, pk):
         auction.delete()
         return redirect('index')
 
+    if request.method == "GET":
+        return render(request, "auctions/delete.html", {
+            'auction': auction, 
+            'route': 'listing'
+        })
+
     context= {
-        'auction': auction
+        'auction': auction,
+        'route': 'index'
     }
 
     return render(request, "auctions/delete.html", context)
 
 def listing(request, pk):
     auction = Auction.objects.get(id=pk)
-
     return render(request, "auctions/display.html", {
-        'listing': auction
+        'listing': auction, 'username': request.user.username, 'highest': Bid.objects.filter(listing=auction.name).aggregate(Max('bidValue'))['bidValue__max']
     })
