@@ -1,0 +1,84 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+    {% block body %}
+        <div class="card bg-light">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm">
+                        <img src={{ listing.url }} class="img-fluid" alt="Listing image">
+                    </div>
+                    <div class="col-sm">
+                        <div class="row">
+                            <div class="col">
+                                <h4>{{ listing.name }}</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h6>Current Bid: ${{ highest }}</h6>
+                                <p>Category: {{ listing.category }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <p>{{ listing.description }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {% if listing.createdBy.username == username %}
+                                    <small class="text-muted">Created {{ listing.datetime }} by you</small>
+                                {% else %}
+                                    <small class="text-muted">Created {{ listing.datetime }} by {{ listing.createdBy.username }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {% if listing.createdBy.username == username %}
+                                    <tr>
+                                        <td>
+                                            <a class="btn btn-sm btn-info" href="{% url 'update' listing.id %}">Update</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-danger" href="{% url 'delete' listing.id %}">Delete</a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br></br>
+                <hr>
+                <div class="row justify-content-center">
+                    <h2>Bids:</h2>
+                </div>
+                <div class="row justify-content-center">
+                    <p><em>${{ listing.bid }} was the starting bid</em></p>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% if listing.createdBy.username != username %}
+                            <form action="" method="post">        
+                                {% csrf_token %}
+                                {{ bidForm|crispy }}
+                                <div class="text-center">
+                                    <button class="btn btn-primary" type="submit" name="Submit">Bid</button>
+                                </div>
+                            </form>
+                        {% else %}
+
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row justify-content-center">
+                    <h2>Comments:</h2>
+                </div>
+            </div>
+        </div>
+
+    {% endblock %}
