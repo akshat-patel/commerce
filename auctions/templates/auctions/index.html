@@ -1,6 +1,6 @@
 {% extends "auctions/layout.html" %}
 {% load static %}
-
+{% load max_tags %}
 
 {% block body %}
     <h2>Active Listings</h2>
@@ -9,7 +9,7 @@
         Please login to see active listings.
     {% endif %}
     {% if user.is_authenticated %}
-        {% for listing in auctions %}
+        {% for index, listing in auctions %}
             <div class="card bg-light">
                 <div class="card-body">
                     <div class="row">
@@ -24,7 +24,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <h6>Bid: ${{ listing.bid }}</h6>
+                                    <h6>Current Bid: ${{ maxValues|index:forloop.counter0 }}</h6>
                                     <p>Category: {{ listing.category }}</p>
                                 </div>
                             </div>

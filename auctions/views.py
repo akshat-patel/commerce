@@ -7,15 +7,17 @@ from django.views.generic import CreateView
 from django.db.models import Max
 
 from .models import User, Bid, Auction, Comment
-from .forms import AuctionForm
-
-#Bid.objects.filter(listing="Nerf Gun").aggregate(Max('bidValue'))
+from .forms import AuctionForm, BidForm
 
 def index(request):
     auctions = Auction.objects.all()
+    listings_maxValues = []
+    for listing in auctions:
+        listings_maxValues += [Bid.objects.filter(listing=listing.name).aggregate(Max('bidValue'))['bidValue__max']]
     context = {
-        'auctions': auctions,
-        'username': request.user.username
+        'auctions': enumerate(auctions),
+        'username': request.user.username,
+        'maxValues': listings_maxValues,
     }
     return render(request, "auctions/index.html", context)
 
@@ -122,6 +124,10 @@ def delete(request, pk):
 
 def listing(request, pk):
     auction = Auction.objects.get(id=pk)
+    bid = BidForm(instance=auction.currentBid)
+    if request.method == "POST":
+        breakpoint()
+        pass
     return render(request, "auctions/display.html", {
-        'listing': auction, 'username': request.user.username, 'highest': Bid.objects.filter(listing=auction.name).aggregate(Max('bidValue'))['bidValue__max']
+        'listing': auction, 'username': request.user.username, 'highest': Bid.objects.filter(listing=auction.name).aggregate(Max('bidValue'))['bidValue__max'], 'bidForm': bid
     })
