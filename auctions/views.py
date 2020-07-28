@@ -10,14 +10,22 @@ from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm, BidForm
 
 def index(request):
+    
     auctions = Auction.objects.all()
+
     listings_maxValues = []
     for listing in auctions:
         listings_maxValues += [Bid.objects.filter(listing=listing.name).aggregate(Max('bidValue'))['bidValue__max']]
+
+    highestBidBy = []
+    for count, listing in enumerate(auctions):
+        highestBidBy += [Bid.objects.filter(listing=listing.name).filter(bidValue=listings_maxValues[count]).get().user.username]
+
     context = {
         'auctions': enumerate(auctions),
         'username': request.user.username,
         'maxValues': listings_maxValues,
+        'highestBidBy': highestBidBy
     }
     return render(request, "auctions/index.html", context)
 
@@ -88,6 +96,7 @@ def create(request):
 
 def update(request, pk):
     listing = Auction.objects.get(id=pk)
+    original_name = listing.name
     form = AuctionForm(instance=listing)
     if request.method == "POST":
         form = AuctionForm(request.POST, instance=listing)
@@ -95,9 +104,13 @@ def update(request, pk):
             listing = form.save(commit=False)
             if form.has_changed() and form.changed_data == ['bid']:
                 listing.currentBid.delete()
-            listing.createdBy = User.objects.filter(username=request.user.username).get()
-            listing.currentBid = Bid(bidValue=int(request.POST["bid"]), user=User.objects.filter(username=request.user.username).get(), listing=request.POST["name"])
-            listing.currentBid.save()
+            if form.has_changed() and form.changed_data == ['name']:
+                breakpoint()
+                bids = Bid.objects.filter(listing=original_name)
+                for bid in bids:
+                    bid.listing = request.POST["name"]
+                    bid.save()
+            listing.createdBy = request.user
             listing.save()
             return redirect('index')
     context = {"form": form, "updateTitle": 'Update'}
@@ -124,10 +137,26 @@ def delete(request, pk):
 
 def listing(request, pk):
     auction = Auction.objects.get(id=pk)
-    bid = BidForm(instance=auction.currentBid)
+    highest = Bid.objects.filter(listing=auction.name).aggregate(Max('bidValue'))['bidValue__max']
+    bid = BidForm(instance=Bid.objects.filter(bidValue=highest)[0])
     if request.method == "POST":
-        breakpoint()
-        pass
+        form = BidForm(request.POST, instance=Bid.objects.filter(bidValue=highest)[0])
+        if int(request.POST['bidValue']) <= highest:
+            return render(request, 'auctions/display.html', {
+                'error': 'Your bid has to be greater than the current bid.',
+                'listing': auction,
+                'username': request.user.username,
+                'highest': highest,
+                'bidForm': bid,
+                'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username
+            })
+        if form.is_valid():
+            if Bid.objects.filter(listing=auction.name).filter(user=request.user).count() == 1:
+                Bid.objects.filter(listing=auction.name).filter(user=request.user).get().delete()
+            bid = form.save(commit=False)
+            bid = Bid(bidValue=bid.bidValue, user=request.user, listing=auction.name)
+            bid.save()
+            return redirect('listing', pk)
     return render(request, "auctions/display.html", {
-        'listing': auction, 'username': request.user.username, 'highest': Bid.objects.filter(listing=auction.name).aggregate(Max('bidValue'))['bidValue__max'], 'bidForm': bid
+        'listing': auction, 'username': request.user.username, 'highest': highest, 'bidForm': bid, 'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username
     })

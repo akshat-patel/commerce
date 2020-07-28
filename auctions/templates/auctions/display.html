@@ -17,7 +17,11 @@
                         </div>
                         <div class="row">
                             <div class="col">
-                                <h6>Current Bid: ${{ highest }}</h6>
+                                {% if request.user.username == highestBidBy %}
+                                    <h6>Current Bid: ${{ highest }} by you</h6>
+                                {% else %}
+                                    <h6>Current Bid: ${{ highest }} by {{ highestBidBy }}</h6>
+                                {% endif %}
                                 <p>Category: {{ listing.category }}</p>
                             </div>
                         </div>
@@ -62,15 +66,30 @@
                 <div class="row">
                     <div class="col">
                         {% if listing.createdBy.username != username %}
-                            <form action="" method="post">        
-                                {% csrf_token %}
-                                {{ bidForm|crispy }}
+                            {% if error %}
+                                <form action="" method="post" novalidate>        
+                                    {% csrf_token %}
+                                    {{ bidForm|crispy }}
+                                    <p style="color:red;">{{ error }}</p>
+                                    <div class="text-center">
+                                        <button class="btn btn-primary" type="submit" name="Submit">Bid</button>
+                                    </div>
+                                </form>
+                            {% else %}
+                                <form action="" method="post" novalidate>        
+                                    {% csrf_token %}
+                                    {{ bidForm|crispy }}
+                                    <div class="text-center">
+                                        <button class="btn btn-primary" type="submit" name="Submit">Bid</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <form action="{% url 'index' %}" method="post">
                                 <div class="text-center">
-                                    <button class="btn btn-primary" type="submit" name="Submit">Bid</button>
+                                    <button class="btn btn-primary" type="submit" name="Close">Close</button>        
                                 </div>
                             </form>
-                        {% else %}
-
                         {% endif %}
                     </div>
                 </div>

@@ -21,10 +21,17 @@
                                 <div class="col">
                                     <a href="{% url 'listing' listing.id %}" style="color:black;" class="p-0 btn-lg btn-link">{{ listing.name }}</a>
                                 </div>
+                                {% if listing.closed %}
+                                    <div class="col"><h5 style="color:red;">CLOSED</h5></div>
+                                {% endif %}
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <h6>Current Bid: ${{ maxValues|index:forloop.counter0 }}</h6>
+                                    {% if request.user.username == highestBidBy|index:forloop.counter0 %}
+                                        <h6>Current Bid: ${{ maxValues|index:forloop.counter0 }} by you</h6>
+                                    {% else %}
+                                        <h6>Current Bid: ${{ maxValues|index:forloop.counter0 }} by {{ highestBidBy|index:forloop.counter0 }}</h6>
+                                    {% endif %}
                                     <p>Category: {{ listing.category }}</p>
                                 </div>
                             </div>

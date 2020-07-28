@@ -41,6 +41,6 @@ class Auction(models.Model):
     dateTime = models.DateTimeField(auto_now_add=True, name="datetime")
     url = models.URLField(max_length=300, default="", blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auctions", blank=True, null=True, default='')
-
+    closed = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.name}"
