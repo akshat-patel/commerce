@@ -85,9 +85,10 @@
                                 </form>
                             {% endif %}
                         {% else %}
-                            <form action="{% url 'index' %}" method="post">
+                            <form action="{% url 'index' %}" method="POST">
+                                {% csrf_token %}
                                 <div class="text-center">
-                                    <button class="btn btn-primary" type="submit" name="Close">Close</button>        
+                                    <button class="btn btn-primary" type="submit" name="Close" value={{ listing.id }}>Close</button>        
                                 </div>
                             </form>
                         {% endif %}

@@ -10,7 +10,6 @@ from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm, BidForm
 
 def index(request):
-    
     auctions = Auction.objects.all()
 
     listings_maxValues = []
@@ -27,6 +26,13 @@ def index(request):
         'maxValues': listings_maxValues,
         'highestBidBy': highestBidBy
     }
+
+    if request.method == "POST":
+        if request.POST['Close']:
+            for listing in auctions:
+                if listing.id == int(request.POST['Close']):
+                    listing.closed = True
+                    listing.save()
     return render(request, "auctions/index.html", context)
 
 def login_view(request):
