@@ -1,7 +1,6 @@
 from django import forms
-from .models import Auction, Bid
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+from .models import Auction, Bid, Comment
+
 
 class AuctionForm(forms.ModelForm):
     class Meta:
@@ -12,3 +11,12 @@ class BidForm(forms.ModelForm):
     class Meta:
         model = Bid
         fields = ["bidValue"]       
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields['comment'].widget.attrs.update({'class': 'form-control col-sm-24'}, style='max-height: 7em')

@@ -4,11 +4,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import CreateView
+from django.forms.models import model_to_dict
 from django.db.models import Max
 from datetime import datetime
 
 from .models import User, Bid, Auction, Comment
-from .forms import AuctionForm, BidForm
+from .forms import AuctionForm, BidForm, CommentForm
 
 def index(request):
     auctions = Auction.objects.all()
@@ -146,24 +147,63 @@ def listing(request, pk):
     auction = Auction.objects.get(id=pk)
     highest = Bid.objects.filter(listing=auction.name).aggregate(Max('bidValue'))['bidValue__max']
     bid = BidForm(instance=Bid.objects.filter(bidValue=highest)[0])
+    comment = CommentForm()
     if request.method == "POST":
-        form = BidForm(request.POST, instance=Bid.objects.filter(bidValue=highest)[0])
-        if int(request.POST['bidValue']) <= highest:
-            return render(request, 'auctions/display.html', {
-                'error': 'Your bid has to be greater than the current bid.',
-                'listing': auction,
-                'username': request.user.username,
-                'highest': highest,
-                'bidForm': bid,
-                'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username
-            })
-        if form.is_valid():
-            if Bid.objects.filter(listing=auction.name).filter(user=request.user).count() == 1:
-                Bid.objects.filter(listing=auction.name).filter(user=request.user).get().delete()
-            bid = form.save(commit=False)
-            bid = Bid(bidValue=bid.bidValue, user=request.user, listing=auction.name)
-            bid.save()
-            return redirect('listing', pk)
+        commentForm = CommentForm(request.POST)
+        bidForm = BidForm(request.POST, instance=Bid.objects.filter(bidValue=highest)[0])
+        if 'bidValue' in request.POST:
+            if int(request.POST['bidValue']) <= highest:
+                return render(request, 'auctions/display.html', {
+                    'error': 'Your bid has to be greater than the current bid.',
+                    'listing': auction,
+                    'username': request.user.username,
+                    'highest': highest,
+                    'bidForm': bid,
+                    'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username
+                })
+            if bidForm.is_valid():
+                if Bid.objects.filter(listing=auction.name).filter(user=request.user).count() == 1:
+                    Bid.objects.filter(listing=auction.name).filter(user=request.user).get().delete()
+                bid = bidForm.save(commit=False)
+                bid = Bid(bidValue=bid.bidValue, user=request.user, listing=auction.name)
+                bid.save()
+        
+        if 'comment' in request.POST:
+            if commentForm.is_valid():
+                comment = commentForm.save(commit=False)
+                comment = Comment(comment=comment.comment, user=request.user, listing=auction.name)
+                comment.save()
+
+        if 'Watchlist' in request.POST:
+            if 'watchlist' not in request.session:
+                request.session['watchlist'] = []
+            request.session['watchlist'] += [auction.name]
+            request.session.modified = True
+
+        return redirect('listing', pk)
+    
+    comments = Comment.objects.all()
+
     return render(request, "auctions/display.html", {
-        'listing': auction, 'username': request.user.username, 'highest': highest, 'bidForm': bid, 'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username,
+        'listing': auction, 'username': request.user.username, 'highest': highest, 'bidForm': bid, 'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username, 'commentForm': comment, 'comments': comments
+    })
+
+def watchlist(request, username):
+    auctions = []
+    for listing in request.session['watchlist']:
+        auctions += [Auction.objects.filter(name=listing).get()]
+
+    listings_maxValues = []
+    for listing in auctions:
+        listings_maxValues += [Bid.objects.filter(listing=listing.name).aggregate(Max('bidValue'))['bidValue__max']]
+
+    highestBidBy = []
+    for count, listing in enumerate(auctions):
+        highestBidBy += [Bid.objects.filter(listing=listing.name).filter(bidValue=listings_maxValues[count]).get().user.username]
+    
+    return render(request, 'auctions/watchlist.html', {
+        'auctions': enumerate(auctions),
+        'username': request.user.username,
+        'maxValues': listings_maxValues,
+        'highestBidBy': highestBidBy
     })

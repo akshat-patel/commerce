@@ -53,6 +53,14 @@
                                             <td>
                                                 <a class="btn btn-sm btn-danger" href="{% url 'delete' listing.id %}">Delete</a>
                                             </td>
+                                            <td>
+                                                <form style="display:inline;" action="" method="POST">
+                                                    {% csrf_token %}
+                                                    {% if not listing.closed %}
+                                                        <button class="btn btn-sm btn-success" type="submit" name="Watchlist" value={{ listing.id }}>Add</button>        
+                                                    {% endif %}
+                                                </form>
+                                            </td>
                                         </tr>
                                     {% endif %}
                                 {% endif %}
@@ -114,6 +122,27 @@
                 <hr>
                 <div class="row justify-content-center">
                     <h2>Comments:</h2>
+                </div>
+                <div class="row justify-content-center">
+                    <form action="" method="post" novalidate>        
+                        {% csrf_token %}
+                        {{ commentForm|crispy }}
+                        <div class="text-center">
+                            <button class="btn btn-primary" type="submit" name="Submit">Comment</button>
+                        </div>
+                    </form>        
+                </div>
+                <br></br>
+                <div class="row justify-content-center">
+                    <ul>
+                        {% for comment in comments %}
+                            {% if comment.listing == listing.name %}
+                                <li>
+                                    {{ comment.user.username }}: {{ comment.comment }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
