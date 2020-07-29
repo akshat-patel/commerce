@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import CreateView
 from django.db.models import Max
+from datetime import datetime
 
 from .models import User, Bid, Auction, Comment
 from .forms import AuctionForm, BidForm
@@ -164,5 +165,5 @@ def listing(request, pk):
             bid.save()
             return redirect('listing', pk)
     return render(request, "auctions/display.html", {
-        'listing': auction, 'username': request.user.username, 'highest': highest, 'bidForm': bid, 'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username
+        'listing': auction, 'username': request.user.username, 'highest': highest, 'bidForm': bid, 'highestBidBy': Bid.objects.filter(listing=auction.name).filter(bidValue=highest).get().user.username,
     })

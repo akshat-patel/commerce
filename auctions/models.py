@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import datetime
 from django.core.validators import MinValueValidator
+from django.utils.timezone import now
 
 class User(AbstractUser):
     pass
@@ -44,4 +45,3 @@ class Auction(models.Model):
     closed = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.name}"
-    
