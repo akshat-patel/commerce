@@ -128,11 +128,13 @@ def delete(request, pk):
     auction = Auction.objects.get(id=pk)
     if request.method == "POST":
         auction.delete()
+        request.session['watchlist'].remove(auction.name)
+        request.session.modified = True
         return redirect('index')
 
     if request.method == "GET":
         return render(request, "auctions/delete.html", {
-            'auction': auction, 
+            'auction': auction,
             'route': 'listing'
         })
 
@@ -190,6 +192,7 @@ def listing(request, pk):
 
 def watchlist(request, username):
     auctions = []
+    
     for listing in request.session['watchlist']:
         auctions += [Auction.objects.filter(name=listing).get()]
 
@@ -206,4 +209,10 @@ def watchlist(request, username):
         'username': request.user.username,
         'maxValues': listings_maxValues,
         'highestBidBy': highestBidBy
+    })
+
+def categories(request):
+    breakpoint()
+    return render(request, 'auctions/categories.html', {
+        'categories': Auction.CATEGORY_CHOICES
     })
