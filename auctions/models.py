@@ -44,6 +44,7 @@ class Auction(models.Model):
     url = models.URLField(max_length=300, default="", blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auctions", blank=True, null=True, default='')
     closed = models.BooleanField(default=False)
+    watchlisted = models.BooleanField(default=False)
     comment = models.ForeignKey(Comment, on_delete=models.SET_NULL, related_name='auctions', blank=True, null=True)
 
     def __str__(self):

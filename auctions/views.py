@@ -127,8 +127,8 @@ def update(request, pk):
 def delete(request, pk):
     auction = Auction.objects.get(id=pk)
     if request.method == "POST":
+        Bid.objects.filter(listing=auction.name).delete()
         auction.delete()
-        request.session['watchlist'].remove(auction.name)
         request.session.modified = True
         return redirect('index')
 
@@ -179,8 +179,11 @@ def listing(request, pk):
         if 'Watchlist' in request.POST:
             if 'watchlist' not in request.session:
                 request.session['watchlist'] = []
-            request.session['watchlist'] += [auction.name]
+            if auction.name not in request.session['watchlist']:
+                request.session['watchlist'] += [auction.name]
             request.session.modified = True
+            auction.watchlisted = True
+            auction.save()
 
         return redirect('listing', pk)
     
@@ -194,7 +197,8 @@ def watchlist(request, username):
     auctions = []
     
     for listing in request.session['watchlist']:
-        auctions += [Auction.objects.filter(name=listing).get()]
+        if listing in [auction.name for auction in Auction.objects.all()]:
+            auctions += [Auction.objects.filter(name=listing).get()]
 
     listings_maxValues = []
     for listing in auctions:
@@ -204,6 +208,17 @@ def watchlist(request, username):
     for count, listing in enumerate(auctions):
         highestBidBy += [Bid.objects.filter(listing=listing.name).filter(bidValue=listings_maxValues[count]).get().user.username]
     
+    if request.method == "POST":
+        auction = Auction.objects.get(pk=int(request.POST["Remove"]))
+        request.session['watchlist'].remove(auction.name)
+        auction.watchlisted = False
+        auction.save()
+        index = auctions.index(auction)
+        del auctions[index]
+        del listings_maxValues[index]
+        del highestBidBy[index]
+
+
     return render(request, 'auctions/watchlist.html', {
         'auctions': enumerate(auctions),
         'username': request.user.username,
@@ -211,8 +226,39 @@ def watchlist(request, username):
         'highestBidBy': highestBidBy
     })
 
-def categories(request):
-    breakpoint()
+def categories(request, *args ,**kwargs):
+    if kwargs:
+        auctions = Auction.objects.filter(category=kwargs['category']).filter(closed=False)
+
+        listings_maxValues = []
+        for listing in auctions:
+            listings_maxValues += [Bid.objects.filter(listing=listing.name).aggregate(Max('bidValue'))['bidValue__max']]
+
+        highestBidBy = []
+        for count, listing in enumerate(auctions):
+            highestBidBy += [Bid.objects.filter(listing=listing.name).filter(bidValue=listings_maxValues[count]).get().user.username]
+
+        context = {
+            'auctions': enumerate(auctions),
+            'username': request.user.username,
+            'maxValues': listings_maxValues,
+            'highestBidBy': highestBidBy,
+            'category': kwargs['category']
+        }
+
+        return render(request, 'auctions/index.html', context)
+
+    categories = {}
+    choices = Auction.CATEGORY_CHOICES
+    auctions = Auction.objects.all()
+    for choice in choices:
+        for listing in auctions:
+            if listing.category == choice[0]:
+                if listing.category not in categories:
+                    categories[listing.category] = []    
+                categories[listing.category] += [listing]
+
+    
     return render(request, 'auctions/categories.html', {
-        'categories': Auction.CATEGORY_CHOICES
+        'categories': choices
     })

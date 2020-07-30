@@ -3,8 +3,11 @@
 {% load max_tags %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-
+    {% if category %}
+        <h2>{{ category }}</h2>
+    {% else %}
+        <h2>Active Listings</h2>
+    {% endif %}
     {% if not user.is_authenticated %}
         Please login to see active listings.
     {% endif %}
